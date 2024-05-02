@@ -271,6 +271,7 @@ export class MassaStationAccount implements IAccount {
     fee?: bigint,
     maxGas?: bigint,
     nonPersistentExecution = false,
+    description = '',
   ): Promise<ITransactionDetails | IContractReadOperationResponse> {
     if (nonPersistentExecution) {
       return this.readSc(contractAddress, functionName, parameter, maxGas);
@@ -294,6 +295,7 @@ export class MassaStationAccount implements IAccount {
       // If maxGas is not provided, estimation will be done by MS
       maxGas: maxGas ? maxGas.toString() : '',
       async: true,
+      description,
     };
 
     CallSCOpResponse = await postRequest<ITransactionDetails>(url, body);

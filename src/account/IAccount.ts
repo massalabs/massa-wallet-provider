@@ -72,6 +72,7 @@ export interface IAccount {
     fee: bigint,
     maxGas: bigint,
     nonPersistentExecution?: boolean,
+    description?: string,
   ): Promise<ITransactionDetails | IContractReadOperationResponse>;
 
   /**

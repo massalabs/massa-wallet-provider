@@ -7,8 +7,9 @@ export type ExecuteFunctionBody = {
   args?: string;
   fee?: string;
   maxGas?: string;
-  coins?: number; // number type keeped for backward compatibility
+  coins?: number; // number type kept for backward compatibility
   async?: boolean;
+  description?: string;
 };
 
 export type PluginInfo = {

@@ -15,17 +15,27 @@ export const supportedWallets: WalletInterfaces = [
 export async function getWallets(delay = 200): Promise<Wallet[]> {
   await wait(delay);
 
-  const walletPromises = supportedWallets.map(async (WalletClass) => {
-    try {
-      return await WalletClass.createIfInstalled();
-    } catch (error) {
-      console.error(`Error initializing wallet ${WalletClass.name}:`, error);
-    }
-    return null;
-  });
+  // https://github.com/massalabs/wallet-provider/issues/281
+  const wrapWithTimeout = async (
+    promise: Promise<Wallet | null>,
+    timeout: number,
+  ): Promise<Wallet | null> => {
+    return Promise.race([
+      promise,
+      new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('Operation timed out')), timeout),
+      ),
+    ]).catch(() => {
+      return null;
+    });
+  };
+
+  const walletPromises = supportedWallets.map((WalletClass) =>
+    wrapWithTimeout(WalletClass.createIfInstalled(), 100),
+  );
 
   const resolvedWallets = await Promise.all(walletPromises);
-  return resolvedWallets.filter((wallet) => !!wallet);
+  return resolvedWallets.filter((wallet) => wallet !== null);
 }
 
 export async function getWallet(

@@ -1,8 +1,5 @@
 import { getRequest, postRequest } from './RequestHandler';
-import {
-  MASSA_STATION_URL,
-  MASSA_STATION_ACCOUNTS_URL,
-} from './MassaStationWallet';
+import { getMSWalletUrl, MASSA_STATION_URL } from './MassaStationWallet';
 import {
   argsToBase64,
   base64ToByteArray,
@@ -117,7 +114,7 @@ export class MassaStationAccount implements Provider {
     };
 
     const res = await postRequest<MSAccountSignResp>(
-      `${MASSA_STATION_ACCOUNTS_URL}/${this.accountName}/signMessage`,
+      `${getMSWalletUrl()}accounts/${this.accountName}/signMessage`,
       signData,
     );
 
@@ -155,7 +152,7 @@ export class MassaStationAccount implements Provider {
     };
 
     const res = await postRequest<MSSendOperationResp>(
-      `${MASSA_STATION_ACCOUNTS_URL}/${this.accountName}/rolls`,
+      `${getMSWalletUrl()}accounts/${this.accountName}/rolls`,
       body,
     );
 
@@ -193,7 +190,7 @@ export class MassaStationAccount implements Provider {
     };
 
     const res = await postRequest<MSSendOperationResp>(
-      `${MASSA_STATION_ACCOUNTS_URL}/${this.accountName}/transfer`,
+      `${getMSWalletUrl()}accounts/${this.accountName}/transfer`,
       body,
     );
 

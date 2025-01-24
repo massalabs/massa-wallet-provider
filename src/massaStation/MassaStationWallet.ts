@@ -21,8 +21,14 @@ export const MASSA_STATION_URL = 'https://station.massa/';
 /**
  * The MassaStation accounts url
  */
-export const MASSA_STATION_ACCOUNTS_URL = `${MASSA_STATION_URL}plugin/massa-labs/massa-wallet/api/accounts`;
 
+export function getMSWalletUrl(): string {
+  // This is a hack to detect that MS wallet is working in standalone mode
+  if (typeof window !== 'undefined' && window.massaWallet?.standalone) {
+    return `http://localhost:8080/api/`;
+  }
+  return `${MASSA_STATION_URL}plugin/massa-labs/massa-wallet/api/`;
+}
 /**
  * Events emitted by MassaStation
  */
@@ -51,7 +57,7 @@ export class MassaStationWallet implements Wallet {
   }
 
   public async accounts(): Promise<MassaStationAccount[]> {
-    const res = await getRequest<MSAccountsResp>(MASSA_STATION_ACCOUNTS_URL);
+    const res = await getRequest<MSAccountsResp>(getMSWalletUrl() + 'accounts');
 
     if (res.isError) {
       throw res.error;
@@ -69,7 +75,7 @@ export class MassaStationWallet implements Wallet {
     publicKey: string,
     privateKey: string,
   ): Promise<void> {
-    const res = await putRequest(MASSA_STATION_ACCOUNTS_URL, {
+    const res = await putRequest(getMSWalletUrl() + 'accounts', {
       publicKey,
       privateKey,
     });
@@ -81,7 +87,7 @@ export class MassaStationWallet implements Wallet {
   public async deleteAccount(address: string): Promise<void> {
     // get all accounts and find the account to delete
     const allAccounts = await getRequest<MSAccountsResp>(
-      MASSA_STATION_ACCOUNTS_URL,
+      getMSWalletUrl() + 'accounts',
     );
 
     if (allAccounts.isError) throw allAccounts.error;
@@ -95,7 +101,7 @@ export class MassaStationWallet implements Wallet {
     }
 
     const res = await deleteRequest<unknown>(
-      `${MASSA_STATION_ACCOUNTS_URL}/${accountToDelete.nickname}`,
+      `${getMSWalletUrl()}accounts/${accountToDelete.nickname}`,
     );
 
     if (res.isError) {
@@ -121,7 +127,7 @@ export class MassaStationWallet implements Wallet {
    */
   public async generateNewAccount(name: string): Promise<MassaStationAccount> {
     const response = await postRequest<MSAccount>(
-      MASSA_STATION_ACCOUNTS_URL + '/' + name,
+      getMSWalletUrl() + 'accounts/' + name,
       {},
     );
 
